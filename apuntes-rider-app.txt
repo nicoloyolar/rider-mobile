@@ -1,0 +1,9 @@
+TO DO LIST:
+
+    - DESARROLLAR FLUJO DE CONDUCTOR
+    - INTEGRAR SISTEMA DE NOTIFICACIONES
+    - INTEGRAR FEEDBACK
+    - integrar botón de pánico
+    - integrar servicio de ayuda - soporte
+    - al activar la ubicación se debe asignar dicha ubicación al campo de 'Origen'
+    - integrar búsqueda aproximada en el campo de destino
