@@ -285,7 +285,20 @@ class _TrasladosScreenState extends State<TrasladosScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return CustomAlertDialog(
+                                  title: "¡Confirmación de Cancelación!",
+                                  message: "Se le cobrará una multa de \$1,000 por cancelar el viaje. ¿Está seguro de continuar?",
+                                  icon: Icons.warning,
+                                  backgroundColor: Colors.orange, 
+                                  onPressed: () {
+                                    Navigator.pop(context); 
+                                  },
+                                );
+                              },
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
@@ -441,21 +454,6 @@ class _TrasladosScreenState extends State<TrasladosScreen> {
                           color: Colors.blue,
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          child: Text('Cancelar Viaje', style: TextStyle(color: Colors.white)),
-                        ),
-                        const SizedBox(height: 30),
                       ],
                     ),
                   ),
