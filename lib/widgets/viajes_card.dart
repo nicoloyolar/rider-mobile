@@ -54,7 +54,7 @@ class ViajeCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Costo: \$${viaje.costo.toStringAsFixed(2)}',
+              'Costo: \$${viaje.costo.toStringAsFixed(3)}',
               style: const TextStyle(
                 fontSize: 16,
                 color: Color(0xFF0462FF),
