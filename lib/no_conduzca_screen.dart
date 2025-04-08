@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, library_private_types_in_public_api, prefer_final_fields
 
 import 'package:flutter/material.dart';
+import 'package:rider/widgets/custom_alert_dialog.dart';
 
 class SiNoDeboConducirScreen extends StatefulWidget {
   const SiNoDeboConducirScreen({super.key});
@@ -49,61 +50,15 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Column(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: const Color(0xFF0462FF),
-                child: const Icon(Icons.check_circle, color: Colors.white, size: 40),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "¡Reserva Exitosa!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          content: const Text(
-            "Tu cita en el taller ha sido agendada correctamente. No olvides proporcionar el dinero para el servicio y los documentos del vehículo.",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0462FF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Center(
-                  child: Text(
-                    'Aceptar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+        return CustomAlertDialog(
+          title: "¡Reserva Exitosa!",
+          message:
+              "Has solicitado un vehículo exitosamente. No olvides proporcionar el dinero para el servicio y los documentos del vehículo.",
+          icon: Icons.check_circle,
+          backgroundColor: const Color(0xFF0462FF),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         );
       },
     );
@@ -126,7 +81,6 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 _buildDropdownField(
                   label: "Tipo de vehículo",
                   icon: Icons.directions_car,
@@ -176,7 +130,6 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Text("Método de pago", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 _buildDropdownField(
                   label: "Método de pago",
                   icon: Icons.payment,

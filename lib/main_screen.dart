@@ -61,10 +61,6 @@ class ViajesScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            _buildSectionTitle('Reservas'),
-            _buildServiceGrid(context, [
-              _buildServiceCard(context, 'Calendario de Reservas', Icons.calendar_month),
-            ], isTall: true), 
           ],
         ),
       ),

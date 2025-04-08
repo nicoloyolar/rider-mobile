@@ -58,7 +58,6 @@ class _RevisionTecnicaScreenState extends State<RevisionTecnicaScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
-                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               _buildDropdownField(
                 label: "Tipo de vehículo",
                 icon: Icons.directions_car,
@@ -108,7 +107,6 @@ class _RevisionTecnicaScreenState extends State<RevisionTecnicaScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              const Text("Selecciona el tipo de servicio", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               _buildDropdownField(
                 label: "Tipo de servicio",
                 icon: Icons.work,

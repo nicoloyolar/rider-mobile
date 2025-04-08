@@ -49,4 +49,4 @@ REVISIÓN EN DISPOSITIVO
 
     - CONDUCTOR 
 
-        - se debe desarrollar la vista del conductor 
+        - se deben desarrollar todas las funcionalidades del conductor  

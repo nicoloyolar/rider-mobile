@@ -1,8 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:rider/driver_screen.dart';
 import 'package:rider/main_screen.dart';
-import 'package:rider/register_driver_screen.dart';
 import 'package:rider/register_screen.dart';
 import 'package:rider/widgets/custom_alert_dialog.dart';
 
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => DriverRegisterScreen(),
+            builder: (context) => DriverScreen(userEmail: correo),
           ),
         );
       }
