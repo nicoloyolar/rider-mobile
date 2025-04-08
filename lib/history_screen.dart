@@ -1,30 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:rider/account_screen.dart';
-import 'package:rider/main_screen.dart';
 import 'package:rider/widgets/custom_app_bar.dart';
+import 'package:rider/widgets/viajes_card.dart';
 
 class HistorialScreen extends StatelessWidget {
   final String userEmail;
 
-  const HistorialScreen({super.key, required this.userEmail});
+  HistorialScreen({super.key, required this.userEmail});
+
+  final List<Viaje> viajes = [
+    Viaje(
+      origen: 'Avenida Libertador, Buenos Aires',
+      destino: 'Calle Figueroa Alcorta, Buenos Aires',
+      fecha: '2025-04-06',
+      hora: '08:30 AM',
+      costo: 4.500,
+      estado: 'Completado',
+    ),
+    Viaje(
+      origen: 'Av. 9 de Julio, Buenos Aires',
+      destino: 'Av. Corrientes, Buenos Aires',
+      fecha: '2025-04-05',
+      hora: '10:00 AM',
+      costo: 3.200,
+      estado: 'Completado',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Cuenta',  
-        userEmail: userEmail,  
-        onLogout: () {
-        },
+        title: 'Historial de Viajes',
+        userEmail: userEmail,
+        onLogout: () {},
       ),
-      body: Center(
-        child: Text(
-          'No se han encontrado registros de viajes.',
-          style: TextStyle(
-            fontSize: 18,
-            color: Colors.grey[600],
-          ),
-        ),
+      body: ListView.builder(
+        itemCount: viajes.length,
+        itemBuilder: (context, index) {
+          final viaje = viajes[index];
+          return ViajeCard(viaje: viaje); // Usamos el widget ViajeCard
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Color(0xFF0462FF),
@@ -35,16 +50,10 @@ class HistorialScreen extends StatelessWidget {
             case 0:
               break;
             case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ViajesScreen(userEmail: userEmail)),
-              );
+              // Navegar a ViajesScreen
               break;
             case 2:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => CuentaScreen(userEmail: userEmail)),
-              );              
+              // Navegar a CuentaScreen
               break;
           }
         },

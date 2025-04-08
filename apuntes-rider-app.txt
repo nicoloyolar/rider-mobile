@@ -23,7 +23,7 @@ REVISIÓN EN DISPOSITIVO
 
     - HISTORIAL
 
-        - generar viajes simulados
+        - 
 
     - CUENTA        
 
