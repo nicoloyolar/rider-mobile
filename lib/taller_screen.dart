@@ -107,7 +107,7 @@ class _TallerScreenState extends State<TallerScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
       title: const Text("Servicio de Taller", style: TextStyle(color: Colors.white)),

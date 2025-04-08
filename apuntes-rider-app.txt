@@ -7,3 +7,44 @@ TO DO LIST:
     - integrar servicio de ayuda - soporte
     - al activar la ubicación se debe asignar dicha ubicación al campo de 'Origen'
     - integrar búsqueda aproximada en el campo de destino
+
+
+REVISIÓN EN DISPOSITIVO
+
+    - no hay forma de cambiar de pantalla... esto debe considerarse en todas las pantallas que existen
+
+    - LOGIN 
+
+        - 
+    
+    - PANTALLA PRINCIPAL
+
+        - 
+
+    - HISTORIAL
+
+        - generar viajes simulados
+
+    - CUENTA        
+
+        - 
+
+    - SI BEBE NO CONDUZCA
+
+        - 
+
+    - REVISIÓN TÉCNICA 
+
+        - 
+
+    - TRASLADO A OTRAS CIUDADES
+
+        - 
+
+    - ADULTO MAYOR  
+
+        - 
+
+    - MASCOTAS  
+
+        - 

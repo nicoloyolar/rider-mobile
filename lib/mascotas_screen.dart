@@ -10,207 +10,157 @@ class ServicioMascotasScreen extends StatefulWidget {
 }
 
 class _ServicioMascotasScreenState extends State<ServicioMascotasScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String? _metodoPago;
-  String? _tipoVehiculo;
-  String? _origen;
-  String? _destino;
-  String? _nombreMascota;
-  String? _tipoMascota;
-  String? _tamanoMascota;
+         String? _tipoVehiculo;
+  String? _modoServicio;
+  DateTime? _fechaSeleccionada;  
+  TimeOfDay? _horaSeleccionada;
+
+  void _seleccionarFecha(BuildContext context) async {
+    DateTime? fecha = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (fecha != null) {
+      setState(() {
+        _fechaSeleccionada = fecha;
+      });
+    }
+  }
+
+  void _seleccionarHora(BuildContext context) async {
+    TimeOfDay? hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (hora != null) {
+      setState(() {
+        _horaSeleccionada = hora;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Servicio de Mascotas"),
+        title: const Text("Revisión Técnica", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0462FF),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              Text("Datos del Servicio de Mascotas", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Nombre de la Mascota',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese el nombre de la mascota';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _nombreMascota = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Tipo de Mascota (Perro, Gato, etc.)',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese el tipo de mascota';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _tipoMascota = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Tamaño de la Mascota (Pequeño, Mediano, Grande)',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese el tamaño de la mascota';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _tamanoMascota = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Punto de Origen',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese el punto de origen';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _origen = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Punto de Destino',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingrese el punto de destino';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _destino = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Método de Pago',
-                  border: OutlineInputBorder(),
-                ),
-                value: _metodoPago,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _metodoPago = newValue;
-                  });
-                },
-                items: <String>['Efectivo', 'Tarjeta de Crédito', 'Transferencia']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor seleccione un método de pago';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Tipo de Vehículo',
-                  border: OutlineInputBorder(),
-                ),
+        child: Center(
+          child: 
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center, 
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de vehículo",
+                icon: Icons.directions_car,
                 value: _tipoVehiculo,
+                items: ["Auto", "Moto", "Camioneta"],
                 onChanged: (String? newValue) {
                   setState(() {
                     _tipoVehiculo = newValue;
                   });
                 },
-                items: <String>['Automóvil', 'Furgoneta', 'Camioneta']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor seleccione un tipo de vehículo';
-                  }
-                  return null;
-                },
               ),
-              SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Procesar la solicitud
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('¡Solicitud Enviada!'),
-                          content: Text('Tu solicitud para el servicio de transporte de mascotas ha sido procesada.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Aceptar'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarFecha(context),
+                      icon: Icon(Icons.calendar_today, color: Colors.white),
+                      label: Text(
+                        _fechaSeleccionada == null ? "Elegir Fecha" : "${_fechaSeleccionada!.toLocal()}".split(' ')[0],
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
                   ),
-                ),
-                child: Text('Enviar Solicitud'),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarHora(context),
+                      icon: Icon(Icons.access_time, color: Colors.white),
+                      label: Text(
+                        _horaSeleccionada == null ? "Elegir Hora" : _horaSeleccionada!.format(context),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+              const SizedBox(height: 10),
+              const Text("Selecciona el tipo de traslado", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de traslado",
+                icon: Icons.work,
+                value: _modoServicio,
+                items: ["Persona", "Vehículo"],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _modoServicio = newValue;
+                  });
+                },
+              ),
+              ],
+            ),
         ),
       ),
     );
   }
+}
+
+Widget _buildDropdownField({
+  required String label,
+  required IconData icon,
+  required String? value,
+  required List<String> items,
+  required ValueChanged<String?> onChanged,
+}) {
+  return Material(
+    elevation: 3,
+    borderRadius: BorderRadius.circular(12),
+    child: DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Row(
+            children: [
+              Icon(icon, color: const Color(0xFF0462FF)),
+              const SizedBox(width: 8),
+              Text(item),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      style: const TextStyle(fontSize: 16),
+    ),
+  );
 }

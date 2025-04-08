@@ -10,12 +10,12 @@ class RevisionTecnicaScreen extends StatefulWidget {
 }
 
 class _RevisionTecnicaScreenState extends State<RevisionTecnicaScreen> {
-  String? tipoVehiculo;
-  String? seleccionServicio;
-  DateTime? fechaSeleccionada;
-  TimeOfDay? horaSeleccionada;
+  String? _tipoVehiculo;
+  String? _modoServicio;
+  DateTime? _fechaSeleccionada;  
+  TimeOfDay? _horaSeleccionada;
 
-  void _seleccionarFecha() async {
+  void _seleccionarFecha(BuildContext context) async {
     DateTime? fecha = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -24,124 +24,143 @@ class _RevisionTecnicaScreenState extends State<RevisionTecnicaScreen> {
     );
     if (fecha != null) {
       setState(() {
-        fechaSeleccionada = fecha;
+        _fechaSeleccionada = fecha;
       });
     }
   }
 
-  void _seleccionarHora() async {
+  void _seleccionarHora(BuildContext context) async {
     TimeOfDay? hora = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
     if (hora != null) {
       setState(() {
-        horaSeleccionada = hora;
+        _horaSeleccionada = hora;
       });
     }
-  }
-
-  void _mostrarMensajeRecordatorio() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Recordatorio"),
-          content: Text(
-            "Recuerda proporcionar el dinero para la revisión técnica y los documentos del vehículo al conductor."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Entendido"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Revisión Técnica")),
+      appBar: AppBar(
+        title: const Text("Revisión Técnica", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0462FF),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Selecciona la fecha:"),
-            ElevatedButton(
-              onPressed: _seleccionarFecha,
-              child: Text(fechaSeleccionada == null
-                  ? "Elegir fecha"
-                  : "${fechaSeleccionada!.day}/${fechaSeleccionada!.month}/${fechaSeleccionada!.year}"),
-            ),
-            SizedBox(height: 10),
-            Text("Selecciona la hora:"),
-            ElevatedButton(
-              onPressed: _seleccionarHora,
-              child: Text(horaSeleccionada == null
-                  ? "Elegir hora"
-                  : horaSeleccionada!.format(context)),
-            ),
-            SizedBox(height: 10),
-            Text("Selecciona el tipo de vehículo:"),
-            DropdownButton<String>(
-              value: tipoVehiculo,
-              hint: Text("Elige una opción"),
-              items: ["Automóvil", "Moto", "Camioneta", "Otro"].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  tipoVehiculo = newValue;
-                });
-              },
-            ),
-            SizedBox(height: 10),
-            Text("Selecciona el servicio:"),
-            DropdownButton<String>(
-              value: seleccionServicio,
-              hint: Text("Elige una opción"),
-              items: [
-                "Solo llevar al taller",
-                "Llevar y devolver"
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  seleccionServicio = newValue;
-                  _mostrarMensajeRecordatorio();
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  if (fechaSeleccionada != null && horaSeleccionada != null && tipoVehiculo != null && seleccionServicio != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Servicio de revisión técnica programado exitosamente."))
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Por favor, completa todos los campos."))
-                    );
-                  }
+        child: Center(
+          child: 
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center, 
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de vehículo",
+                icon: Icons.directions_car,
+                value: _tipoVehiculo,
+                items: ["Auto", "Moto", "Camioneta"],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _tipoVehiculo = newValue;
+                  });
                 },
-                child: Text("Confirmar Servicio"),
               ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarFecha(context),
+                      icon: Icon(Icons.calendar_today, color: Colors.white),
+                      label: Text(
+                        _fechaSeleccionada == null ? "Elegir Fecha" : "${_fechaSeleccionada!.toLocal()}".split(' ')[0],
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarHora(context),
+                      icon: Icon(Icons.access_time, color: Colors.white),
+                      label: Text(
+                        _horaSeleccionada == null ? "Elegir Hora" : _horaSeleccionada!.format(context),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text("Selecciona el tipo de servicio", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de servicio",
+                icon: Icons.work,
+                value: _modoServicio,
+                items: ["Solo traslado al taller", "Traslado y devolución"],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _modoServicio = newValue;
+                  });
+                },
+              ),
+              ],
             ),
-          ],
         ),
       ),
     );
   }
+}
+
+Widget _buildDropdownField({
+  required String label,
+  required IconData icon,
+  required String? value,
+  required List<String> items,
+  required ValueChanged<String?> onChanged,
+}) {
+  return Material(
+    elevation: 3,
+    borderRadius: BorderRadius.circular(12),
+    child: DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Row(
+            children: [
+              Icon(icon, color: const Color(0xFF0462FF)),
+              const SizedBox(width: 8),
+              Text(item),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      style: const TextStyle(fontSize: 16),
+    ),
+  );
 }

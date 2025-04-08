@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:rider/account_screen.dart';
 import 'package:rider/main_screen.dart';
+import 'package:rider/widgets/custom_app_bar.dart';
 
 class HistorialScreen extends StatelessWidget {
-  const HistorialScreen({super.key});
+  final String userEmail;
+
+  const HistorialScreen({super.key, required this.userEmail});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Historial', 
-          style: TextStyle(
-            color: Colors.white
-          )
-        ),
-        backgroundColor: Color(0xFF0462FF), 
-        foregroundColor: Colors.white,
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: 'Cuenta',  
+        userEmail: userEmail,  
+        onLogout: () {
+        },
       ),
       body: Center(
         child: Text(
@@ -39,13 +37,13 @@ class HistorialScreen extends StatelessWidget {
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ViajesScreen()),
+                MaterialPageRoute(builder: (context) => ViajesScreen(userEmail: userEmail)),
               );
               break;
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => CuentaScreen()),
+                MaterialPageRoute(builder: (context) => CuentaScreen(userEmail: userEmail)),
               );              
               break;
           }

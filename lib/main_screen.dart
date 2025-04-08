@@ -10,24 +10,22 @@ import 'package:rider/reserva_screen.dart';
 import 'package:rider/revision_tecnica_screen.dart';
 import 'package:rider/taller_screen.dart';
 import 'package:rider/traslado_ciudad_screen.dart';
-import 'package:rider/traslados_screen.dart'; 
+import 'package:rider/traslados_screen.dart';
+import 'package:rider/widgets/custom_app_bar.dart'; 
 
 class ViajesScreen extends StatelessWidget {
-  const ViajesScreen({super.key});
+  final String userEmail;
+
+  const ViajesScreen({super.key, required this.userEmail});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Rider', 
-          style: TextStyle(
-            color: Colors.white
-          )
-        ),
-        backgroundColor: Color(0xFF0462FF), 
-        foregroundColor: Colors.white,
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: 'Rider App',  
+        userEmail: userEmail,  
+        onLogout: () {
+        },
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -79,7 +77,7 @@ class ViajesScreen extends StatelessWidget {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HistorialScreen()),
+                MaterialPageRoute(builder: (context) => HistorialScreen(userEmail: userEmail)),
               );
               break;
             case 1:
@@ -87,7 +85,7 @@ class ViajesScreen extends StatelessWidget {
             case 2:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => CuentaScreen()),
+                MaterialPageRoute(builder: (context) => CuentaScreen(userEmail: userEmail)),
               );
               break;
           }

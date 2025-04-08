@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 //import 'package:rider/farmacia_screen.dart';
-import 'package:rider/taller_screen.dart';
+//import 'package:rider/taller_screen.dart';
 //import 'package:rider/adulto_mayor_screen.dart';
 //import 'package:rider/main_screen.dart';
 //import 'package:rider/register_driver_screen.dart';
@@ -10,7 +10,7 @@ import 'package:rider/taller_screen.dart';
 //import 'package:rider/revision_tecnica_screen.dart';
 //import 'package:rider/farmacia_screen.dart';
 //import 'package:rider/taller_screen.dart';
-//import 'login_screen.dart';
+import 'login_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: TallerScreen(),
+      home: LoginScreen(),
     );
   }
 }

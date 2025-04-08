@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rider/main_screen.dart';
+//import 'package:rider/main_screen.dart';
 
 class VerificationScreen extends StatelessWidget {
   const VerificationScreen({super.key});
@@ -124,10 +124,10 @@ class VerificationScreen extends StatelessWidget {
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                Navigator.push(
+                                /*Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => ViajesScreen()),
-                                );
+                                );*/
                               },
                               child: Center(
                                 child: Text(

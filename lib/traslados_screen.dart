@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'dart:async'; 
+import 'dart:async';
+
+import 'package:rider/widgets/custom_alert_dialog.dart'; 
 
 class TrasladosScreen extends StatefulWidget {
   const TrasladosScreen({super.key});
@@ -465,75 +467,17 @@ class _TrasladosScreenState extends State<TrasladosScreen> {
       },
     ).then((_) {
       Future.delayed(Duration(seconds: 10), () {
-        _mostrarExito(context);
+        return CustomAlertDialog(
+          title: "¡Viaje Exitoso!",
+          message: "Tu viaje ha finalizado. ¡Muchas Gracias! Si tienes alguna pregunta, no dudes en contactarnos.",
+          icon: Icons.check_circle,
+          backgroundColor: const Color(0xFF0462FF),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        );
       });
     });
-  }
-
-  void _mostrarExito(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          titlePadding: EdgeInsets.all(20),
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          title: Column(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Color(0xFF0462FF),
-                child: Icon(Icons.check_circle, color: Colors.white, size: 40),
-              ),
-              SizedBox(height: 10),
-              Text(
-                "¡Viaje Exitoso!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            "Tu viaje ha finalizado. ¡Muchas Gracias! Si tienes alguna pregunta, no dudes en contactarnos.",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0462FF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Center(
-                  child: Text(
-                    'Aceptar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   LatLng _generarUbicacionAleatoria(LatLng centro) {

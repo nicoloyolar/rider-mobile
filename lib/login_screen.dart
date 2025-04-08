@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:rider/main_screen.dart';
 import 'package:rider/register_screen.dart';
+import 'package:rider/widgets/custom_alert_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -55,37 +56,53 @@ final Map<String, Map<String, dynamic>> users = {
     },
   };
 
+  String currentUser = ''; 
+
   void _login() {
-    String correo   = _emailController.text.trim();
+    String correo = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
     if (correo.isEmpty || password.isEmpty) {
-      _showMessage("Por favor, complete todos los campos");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustomAlertDialog(
+            title: "¡Error!",
+            message: "Por favor complete todos los campos",
+            icon: Icons.error,
+            backgroundColor: Colors.red,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          );
+        },
+      );
       return;
     }
 
     if (users.containsKey(correo) && users[correo]!['password'] == password) {
-      String role = users[correo]!['role']!;
-      _showMessage("Inicio de sesión exitoso");
-
-      if (role == 'usuario') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ViajesScreen()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ViajesScreen()),
-        );
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViajesScreen(userEmail: correo), 
+        ),
+      );
     } else {
-      _showMessage("Correo o contraseña incorrectos");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustomAlertDialog(
+            title: "¡Error!",
+            message: "Correo o contraseña incorrectos",
+            icon: Icons.error,
+            backgroundColor: Colors.red,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          );
+        },
+      );
     }
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

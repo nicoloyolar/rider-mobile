@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, library_private_types_in_public_api
+// ignore_for_file: unused_field, library_private_types_in_public_api, prefer_final_fields
 
 import 'package:flutter/material.dart';
 
@@ -16,98 +16,36 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
   String _tipoVehiculo = '';
   String _origen = '';
   String _destino = '';
+  DateTime? _fechaSeleccionada;
+  TimeOfDay? _horaSeleccionada;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Si No Debo Conducir"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Método de Pago", style: TextStyle(fontSize: 16)),
-              TextFormField(
-                decoration: InputDecoration(hintText: "Ingrese el método de pago"),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingrese el método de pago';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _metodoPago = value!;
-                },
-              ),
-              SizedBox(height: 20),
-
-              Text("Tipo de Vehículo", style: TextStyle(fontSize: 16)),
-              TextFormField(
-                decoration: InputDecoration(hintText: "Ingrese el tipo de vehículo"),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingrese el tipo de vehículo';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _tipoVehiculo = value!;
-                },
-              ),
-              SizedBox(height: 20),
-
-              Text("Punto de Origen", style: TextStyle(fontSize: 16)),
-              TextFormField(
-                decoration: InputDecoration(hintText: "Ingrese el punto de origen"),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingrese el punto de origen';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _origen = value!;
-                },
-              ),
-              SizedBox(height: 20),
-
-              Text("Punto de Destino", style: TextStyle(fontSize: 16)),
-              TextFormField(
-                decoration: InputDecoration(hintText: "Ingrese el punto de destino"),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingrese el punto de destino';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _destino = value!;
-                },
-              ),
-              SizedBox(height: 20),
-
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    // Procesar la información
-                    _mostrarExito(context);
-                  }
-                },
-                child: Text("Confirmar"),
-              ),
-            ],
-          ),
-        ),
-      ),
+  void _seleccionarFecha(BuildContext context) async {
+    DateTime? fecha = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
+    if (fecha != null) {
+      setState(() {
+        _fechaSeleccionada = fecha;
+      });
+    }
   }
 
-  void _mostrarExito(BuildContext context) {
+  void _seleccionarHora(BuildContext context) async {
+    TimeOfDay? hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (hora != null) {
+      setState(() {
+        _horaSeleccionada = hora;
+      });
+    }
+  }
+
+  void _mostrarExito() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -115,18 +53,16 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          titlePadding: EdgeInsets.all(20),
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           title: Column(
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: Color(0xFF0462FF),
-                child: Icon(Icons.check_circle, color: Colors.white, size: 40),
+                backgroundColor: const Color(0xFF0462FF),
+                child: const Icon(Icons.check_circle, color: Colors.white, size: 40),
               ),
-              SizedBox(height: 10),
-              Text(
-                "¡Solicitud Exitosa!",
+              const SizedBox(height: 10),
+              const Text(
+                "¡Reserva Exitosa!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20,
@@ -136,8 +72,8 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
               ),
             ],
           ),
-          content: Text(
-            "Tu solicitud ha sido enviada correctamente. Te contactaremos pronto.",
+          content: const Text(
+            "Tu cita en el taller ha sido agendada correctamente. No olvides proporcionar el dinero para el servicio y los documentos del vehículo.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.black54),
           ),
@@ -146,16 +82,16 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0462FF),
+                  backgroundColor: const Color(0xFF0462FF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Center(
+                child: const Center(
                   child: Text(
                     'Aceptar',
                     style: TextStyle(
@@ -170,6 +106,142 @@ class _SiNoDeboConducirScreenState extends State<SiNoDeboConducirScreen> {
           ],
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        title: const Text("Si bebe no conduzca", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0462FF),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                _buildDropdownField(
+                  label: "Tipo de vehículo",
+                  icon: Icons.directions_car,
+                  value: _tipoVehiculo.isEmpty ? null : _tipoVehiculo,
+                  items: ["Auto", "Moto", "Camioneta"],
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _tipoVehiculo = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _seleccionarFecha(context),
+                        icon: const Icon(Icons.calendar_today, color: Colors.white),
+                        label: Text(
+                          _fechaSeleccionada == null ? "Elegir Fecha" : "${_fechaSeleccionada!.toLocal()}".split(' ')[0],
+                          style: const TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0462FF),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _seleccionarHora(context),
+                        icon: const Icon(Icons.access_time, color: Colors.white),
+                        label: Text(
+                          _horaSeleccionada == null ? "Elegir Hora" : _horaSeleccionada!.format(context),
+                          style: const TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0462FF),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text("Método de pago", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                _buildDropdownField(
+                  label: "Método de pago",
+                  icon: Icons.payment,
+                  value: _metodoPago.isEmpty ? null : _metodoPago,
+                  items: ["Efectivo", "Tarjeta", "Transferencia"],
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _metodoPago = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: const Color(0xFF0462FF),
+                    ),
+                    onPressed: _mostrarExito,
+                    child: const Text("Confirmar Reserva", style: TextStyle(fontSize: 16, color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required IconData icon,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Material(
+      elevation: 3,
+      borderRadius: BorderRadius.circular(12),
+      child: DropdownButtonFormField<String>(
+        value: value,
+        items: items.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Row(
+              children: [
+                Icon(icon, color: const Color(0xFF0462FF)),
+                const SizedBox(width: 8),
+                Text(item),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        style: const TextStyle(fontSize: 16),
+      ),
     );
   }
 }

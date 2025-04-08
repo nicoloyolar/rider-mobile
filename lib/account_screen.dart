@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:rider/history_screen.dart';
 import 'package:rider/main_screen.dart';
+import 'package:rider/widgets/custom_app_bar.dart';
 
 class CuentaScreen extends StatelessWidget {
-  const CuentaScreen({super.key});
+  final String userEmail;
+
+  const CuentaScreen({super.key, required this.userEmail});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Cuenta', 
-          style: TextStyle(
-            color: Colors.white
-          )
-        ),
-        backgroundColor: Color(0xFF0462FF), 
-        foregroundColor: Colors.white,
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: 'Cuenta',  
+        userEmail: userEmail,  
+        onLogout: () {
+        },
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -33,7 +31,6 @@ class CuentaScreen extends StatelessWidget {
             _buildAccountOption('Soporte', Icons.help_outline),
             _buildAccountOption('Preguntas Frecuentes', Icons.description),
             _buildAccountOption('Términos y Condiciones', Icons.delete, isRed: true),
-            _buildAccountOption('Cerrar Sesión', Icons.logout, isRed: true),
             _buildAccountOption('Eliminar Cuenta', Icons.logout, isRed: true),
           ],
         ),
@@ -47,13 +44,13 @@ class CuentaScreen extends StatelessWidget {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HistorialScreen()),
+                MaterialPageRoute(builder: (context) => HistorialScreen(userEmail: userEmail)),
               );
               break;
             case 1:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ViajesScreen()),
+                MaterialPageRoute(builder: (context) => ViajesScreen(userEmail: userEmail)),
               );
               break;
             case 2:

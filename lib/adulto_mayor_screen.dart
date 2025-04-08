@@ -1,205 +1,167 @@
-// ignore_for_file: unused_field, library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 
 class ServicioAdultoMayorScreen extends StatefulWidget {
   const ServicioAdultoMayorScreen({super.key});
 
+
   @override
-  _ServicioAdultoMayorScreenState createState() =>
-      _ServicioAdultoMayorScreenState();
+  _ServicioAdultoMayorScreenState createState() => _ServicioAdultoMayorScreenState();
 }
 
 class _ServicioAdultoMayorScreenState extends State<ServicioAdultoMayorScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  // Variables para almacenar los datos del formulario
-  String? _personaSeleccionada;
-  String? _metodoPago;
   String? _tipoVehiculo;
-  String? _origen;
-  String? _destino;
+  String? _modoServicio;
+  DateTime? _fechaSeleccionada;  
+  TimeOfDay? _horaSeleccionada;
 
-  // Lista de opciones para los métodos de pago, tipo de vehículo, etc.
-  List<String> opcionesPersona = ['Usuario', 'Adulto Mayor'];
-  List<String> opcionesMetodoPago = ['Efectivo', 'Tarjeta'];
-  List<String> opcionesTipoVehiculo = ['Sedán', 'SUV', 'Camioneta'];
+  void _seleccionarFecha(BuildContext context) async {
+    DateTime? fecha = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (fecha != null) {
+      setState(() {
+        _fechaSeleccionada = fecha;
+      });
+    }
+  }
+
+  void _seleccionarHora(BuildContext context) async {
+    TimeOfDay? hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (hora != null) {
+      setState(() {
+        _horaSeleccionada = hora;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Servicio de Adulto Mayor"),
+        title: const Text("Revisión Técnica", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0462FF),
+        centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: 
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center, 
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Seleccione para quién es el servicio:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                DropdownButtonFormField<String>(
-                  value: _personaSeleccionada,
-                  items: opcionesPersona
-                      .map((persona) => DropdownMenuItem<String>(
-                            value: persona,
-                            child: Text(persona),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _personaSeleccionada = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: '¿Para quién es el servicio?',
-                    border: OutlineInputBorder(),
+
+                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de vehículo",
+                icon: Icons.directions_car,
+                value: _tipoVehiculo,
+                items: ["Auto", "Moto", "Camioneta"],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _tipoVehiculo = newValue;
+                  });
+                },
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarFecha(context),
+                      icon: Icon(Icons.calendar_today, color: Colors.white),
+                      label: Text(
+                        _fechaSeleccionada == null ? "Elegir Fecha" : "${_fechaSeleccionada!.toLocal()}".split(' ')[0],
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Este campo es obligatorio';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Seleccione el método de pago:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                DropdownButtonFormField<String>(
-                  value: _metodoPago,
-                  items: opcionesMetodoPago
-                      .map((metodo) => DropdownMenuItem<String>(
-                            value: metodo,
-                            child: Text(metodo),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _metodoPago = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Método de pago',
-                    border: OutlineInputBorder(),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarHora(context),
+                      icon: Icon(Icons.access_time, color: Colors.white),
+                      label: Text(
+                        _horaSeleccionada == null ? "Elegir Hora" : _horaSeleccionada!.format(context),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Este campo es obligatorio';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Seleccione el tipo de vehículo:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                DropdownButtonFormField<String>(
-                  value: _tipoVehiculo,
-                  items: opcionesTipoVehiculo
-                      .map((vehiculo) => DropdownMenuItem<String>(
-                            value: vehiculo,
-                            child: Text(vehiculo),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _tipoVehiculo = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Tipo de vehículo',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Este campo es obligatorio';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Punto de origen:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Ingrese punto de origen',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _origen = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Este campo es obligatorio';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Punto de destino:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Ingrese punto de destino',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _destino = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Este campo es obligatorio';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Aquí se procesarían los datos
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('¡Solicitud Enviada!'),
-                            content: Text('Su solicitud de servicio ha sido registrada correctamente.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Aceptar'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  },
-                  child: Text('Enviar Solicitud'),
-                ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text("Selecciona el tipo de traslado", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de traslado",
+                icon: Icons.work,
+                value: _modoServicio,
+                items: ["Persona", "Vehículo"],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _modoServicio = newValue;
+                  });
+                },
+              ),
               ],
             ),
-          ),
         ),
       ),
     );
   }
+}
+
+Widget _buildDropdownField({
+  required String label,
+  required IconData icon,
+  required String? value,
+  required List<String> items,
+  required ValueChanged<String?> onChanged,
+}) {
+  return Material(
+    elevation: 3,
+    borderRadius: BorderRadius.circular(12),
+    child: DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Row(
+            children: [
+              Icon(icon, color: const Color(0xFF0462FF)),
+              const SizedBox(width: 8),
+              Text(item),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      style: const TextStyle(fontSize: 16),
+    ),
+  );
 }

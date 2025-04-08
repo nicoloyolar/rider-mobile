@@ -10,151 +10,157 @@ class TrasladoCiudadScreen extends StatefulWidget {
 }
 
 class _TrasladoCiudadScreenState extends State<TrasladoCiudadScreen> {
-  TextEditingController fechaController = TextEditingController();
-  TextEditingController horaController = TextEditingController();
-  TextEditingController origenController = TextEditingController();
-  TextEditingController destinoController = TextEditingController();
-  String metodoPago = 'Efectivo';
-  String tipoTraslado = 'Persona';
+  String? _tipoVehiculo;
+  String? _modoServicio;
+  DateTime? _fechaSeleccionada;  
+  TimeOfDay? _horaSeleccionada;
+
+  void _seleccionarFecha(BuildContext context) async {
+    DateTime? fecha = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (fecha != null) {
+      setState(() {
+        _fechaSeleccionada = fecha;
+      });
+    }
+  }
+
+  void _seleccionarHora(BuildContext context) async {
+    TimeOfDay? hora = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (hora != null) {
+      setState(() {
+        _horaSeleccionada = hora;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Traslado de Ciudad'),
+        title: const Text("Revisión Técnica", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0462FF),
+        centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Fecha:', style: TextStyle(fontSize: 16)),
-            TextField(
-              controller: fechaController,
-              decoration: InputDecoration(
-                hintText: 'Selecciona la fecha',
-                suffixIcon: Icon(Icons.calendar_today),
-              ),
-              readOnly: true,
-              onTap: () async {
-                DateTime selectedDate = DateTime.now();
-                final DateTime? picked = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (picked != null && picked != selectedDate) {
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: 
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center, 
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de vehículo",
+                icon: Icons.directions_car,
+                value: _tipoVehiculo,
+                items: ["Auto", "Moto", "Camioneta"],
+                onChanged: (String? newValue) {
                   setState(() {
-                    fechaController.text = "${picked.toLocal()}".split(' ')[0];
+                    _tipoVehiculo = newValue;
                   });
-                }
-              },
-            ),
-            SizedBox(height: 10),
-            Text('Hora:', style: TextStyle(fontSize: 16)),
-            TextField(
-              controller: horaController,
-              decoration: InputDecoration(
-                hintText: 'Selecciona la hora',
-                suffixIcon: Icon(Icons.access_time),
+                },
               ),
-              readOnly: true,
-              onTap: () async {
-                TimeOfDay selectedTime = TimeOfDay.now();
-                final TimeOfDay? picked = await showTimePicker(
-                  context: context,
-                  initialTime: selectedTime,
-                );
-                if (picked != null && picked != selectedTime) {
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarFecha(context),
+                      icon: Icon(Icons.calendar_today, color: Colors.white),
+                      label: Text(
+                        _fechaSeleccionada == null ? "Elegir Fecha" : "${_fechaSeleccionada!.toLocal()}".split(' ')[0],
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _seleccionarHora(context),
+                      icon: Icon(Icons.access_time, color: Colors.white),
+                      label: Text(
+                        _horaSeleccionada == null ? "Elegir Hora" : _horaSeleccionada!.format(context),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF0462FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text("Selecciona el tipo de traslado", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              _buildDropdownField(
+                label: "Tipo de traslado",
+                icon: Icons.work,
+                value: _modoServicio,
+                items: ["Persona", "Vehículo"],
+                onChanged: (String? newValue) {
                   setState(() {
-                    horaController.text = picked.format(context);
+                    _modoServicio = newValue;
                   });
-                }
-              },
-            ),
-            SizedBox(height: 10),
-            Text('Método de Pago:', style: TextStyle(fontSize: 16)),
-            DropdownButton<String>(
-              value: metodoPago,
-              onChanged: (String? newValue) {
-                setState(() {
-                  metodoPago = newValue!;
-                });
-              },
-              items: <String>['Efectivo', 'Tarjeta', 'Transferencia']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 10),
-            Text('Tipo de Traslado:', style: TextStyle(fontSize: 16)),
-            DropdownButton<String>(
-              value: tipoTraslado,
-              onChanged: (String? newValue) {
-                setState(() {
-                  tipoTraslado = newValue!;
-                });
-              },
-              items: <String>['Persona', 'Vehículo']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 10),
-            Text('Punto de Origen:', style: TextStyle(fontSize: 16)),
-            TextField(
-              controller: origenController,
-              decoration: InputDecoration(
-                hintText: 'Introduce el punto de origen',
-                prefixIcon: Icon(Icons.location_on),
+                },
               ),
+              ],
             ),
-            SizedBox(height: 10),
-            Text('Punto de Destino:', style: TextStyle(fontSize: 16)),
-            TextField(
-              controller: destinoController,
-              decoration: InputDecoration(
-                hintText: 'Introduce el punto de destino',
-                prefixIcon: Icon(Icons.location_on),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Aquí podrías agregar la lógica para enviar los datos
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Confirmación'),
-                      content: Text('Traslado programado exitosamente.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text('Aceptar'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 50),
-              ),
-              child: Text('Confirmar Traslado'),
-            ),
-          ],
         ),
       ),
     );
   }
+}
+
+Widget _buildDropdownField({
+  required String label,
+  required IconData icon,
+  required String? value,
+  required List<String> items,
+  required ValueChanged<String?> onChanged,
+}) {
+  return Material(
+    elevation: 3,
+    borderRadius: BorderRadius.circular(12),
+    child: DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Row(
+            children: [
+              Icon(icon, color: const Color(0xFF0462FF)),
+              const SizedBox(width: 8),
+              Text(item),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      style: const TextStyle(fontSize: 16),
+    ),
+  );
 }
