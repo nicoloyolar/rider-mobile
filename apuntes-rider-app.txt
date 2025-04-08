@@ -48,3 +48,7 @@ REVISIÓN EN DISPOSITIVO
     - MASCOTAS  
 
         - 
+
+    - CONDUCTOR 
+
+        - se debe desarrollar la vista del conductor 

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:rider/main_screen.dart';
+import 'package:rider/register_driver_screen.dart';
 import 'package:rider/register_screen.dart';
 import 'package:rider/widgets/custom_alert_dialog.dart';
 
@@ -13,11 +14,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+  final TextEditingController _emailController          = TextEditingController();
+  final TextEditingController _passwordController       = TextEditingController();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldKey  = GlobalKey<ScaffoldMessengerState>();
   
-final Map<String, Map<String, dynamic>> users = {
+  String currentUser = ''; 
+
+  final Map<String, Map<String, dynamic>> users = {
     'usuario': {
       'password': '123456',
       'role': 'usuario',
@@ -56,8 +59,6 @@ final Map<String, Map<String, dynamic>> users = {
     },
   };
 
-  String currentUser = ''; 
-
   void _login() {
     String correo = _emailController.text.trim();
     String password = _passwordController.text.trim();
@@ -81,12 +82,23 @@ final Map<String, Map<String, dynamic>> users = {
     }
 
     if (users.containsKey(correo) && users[correo]!['password'] == password) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ViajesScreen(userEmail: correo), 
-        ),
-      );
+      String role = users[correo]!['role'];
+
+      if (role == 'usuario') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViajesScreen(userEmail: correo),
+          ),
+        );
+      } else if (role == 'conductor') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DriverRegisterScreen(),
+          ),
+        );
+      }
     } else {
       showDialog(
         context: context,

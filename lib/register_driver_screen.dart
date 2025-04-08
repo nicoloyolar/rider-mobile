@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:rider/widgets/custom_alert_dialog.dart';
 
 class DriverRegisterScreen extends StatefulWidget {
   const DriverRegisterScreen({super.key});
@@ -37,30 +38,27 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
   }
 
   Future<void> _registerDriver() async {
-    if (_nameController.text.isEmpty || _emailController.text.isEmpty ||
-        _phoneController.text.isEmpty || _emergencyNameController.text.isEmpty ||
-        _emergencyPhoneController.text.isEmpty || _driverPhoto == null ||
-        _vehiclePhoto == null || _idCard == null || _license == null ||
-        _permit == null || _technicalReview == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Por favor completa todos los campos y sube las imágenes requeridas.")),
-      );
-      return;
-    }
     
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Registro exitoso. En revisión.")),
-    );
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustomAlertDialog(
+            title: "¡Genial!",
+            message: "Tu solicitud está siendo procesada y se te dará respuesta dentro de 48 horas.",
+            icon: Icons.check_circle,
+            backgroundColor: const Color(0xFF0462FF),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          );
+        },
+      );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Registro de Conductores"),
-        backgroundColor: Color(0xFF0462FF),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
