@@ -11,8 +11,7 @@ import 'package:rider/revision_tecnica_screen.dart';
 import 'package:rider/taller_screen.dart';
 import 'package:rider/traslado_ciudad_screen.dart';
 import 'package:rider/traslados_screen.dart';
-import 'package:rider/widgets/custom_app_bar.dart'; 
-import 'package:rider/theme/app_colors.dart';
+import 'package:rider/widgets/custom_app_bar.dart';
 
 class ViajesScreen extends StatelessWidget {
   final String userEmail;
@@ -23,50 +22,43 @@ class ViajesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Rider App',  
-        userEmail: userEmail,  
-        onLogout: () {
-        },
+        title: 'Rider App',
+        userEmail: userEmail,
+        onLogout: () {},
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Forma de Reservar'),
+            _buildSectionTitle(context, 'Forma de Reservar'),
             _buildServiceGrid(context, [
               _buildServiceCard(context, 'Traslados', Icons.directions_car),
               _buildServiceCard(context, 'Reserva', Icons.calendar_today),
-            ], isTall: true), 
-
+            ], isTall: true),
             const SizedBox(height: 20),
-
-            _buildSectionTitle('Entregas'),
+            _buildSectionTitle(context, 'Entregas'),
             _buildServiceGrid(context, [
               _buildServiceCard(context, 'Entregas', Icons.local_shipping),
               _buildServiceCard(context, 'Puerta a Puerta', Icons.home),
               _buildServiceCard(context, 'Farmacia', Icons.local_pharmacy),
-            ], crossAxisCount: 3, isTall: false), 
-
+            ], crossAxisCount: 3, isTall: false),
             const SizedBox(height: 20),
-
-            _buildSectionTitle('Otros Servicios'),
+            _buildSectionTitle(context, 'Otros Servicios'),
             _buildServiceGrid(context, [
               _buildServiceCard(context, 'Taller', Icons.build),
               _buildServiceCard(context, 'Si bebe no conduzca', Icons.child_care),
               _buildServiceCard(context, 'Revisión Técnica', Icons.car_repair),
-              _buildServiceCard(context, 'Traslado a otras ciudades', Icons.pets),
-              _buildServiceCard(context, 'Adulto Mayor', Icons.pets),
+              _buildServiceCard(context, 'Traslado a otras ciudades', Icons.location_city),
+              _buildServiceCard(context, 'Adulto Mayor', Icons.elderly),
               _buildServiceCard(context, 'Mascotas', Icons.pets),
             ], isTall: true),
-
             const SizedBox(height: 20),
-
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Colors.grey,
         currentIndex: 1,
         onTap: (index) {
@@ -88,33 +80,23 @@ class ViajesScreen extends StatelessWidget {
           }
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Historial',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car),
-            label: 'Viajes',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Cuenta',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial'),
+          BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: 'Viajes'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cuenta'),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF0462FF),
-        ),
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
@@ -123,10 +105,10 @@ class ViajesScreen extends StatelessWidget {
     return GridView.count(
       crossAxisCount: crossAxisCount,
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(), 
+      physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 10,
       crossAxisSpacing: 10,
-      childAspectRatio: isTall ? 1.2 : 0.8, 
+      childAspectRatio: isTall ? 1.2 : 0.8,
       children: cards,
     );
   }
@@ -134,83 +116,44 @@ class ViajesScreen extends StatelessWidget {
   Widget _buildServiceCard(BuildContext context, String title, IconData icon) {
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          if (title == 'Traslados') {
+          final routes = {
+            'Traslados': () => const TrasladosScreen(),
+            'Reserva': () => const ReservaScreen(),
+            'Entregas': () => const RiderEntregaScreen(),
+            'Puerta a Puerta': () => const RiderEntregaScreen(),
+            'Farmacia': () => const ServicioFarmaciaScreen(),
+            'Taller': () => const TallerScreen(),
+            'Si bebe no conduzca': () => const SiNoDeboConducirScreen(),
+            'Revisión Técnica': () => const RevisionTecnicaScreen(),
+            'Traslado a otras ciudades': () => const TrasladoCiudadScreen(),
+            'Adulto Mayor': () => const ServicioAdultoMayorScreen(),
+            'Mascotas': () => const ServicioMascotasScreen(),
+          };
+
+          if (routes.containsKey(title)) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TrasladosScreen()),
+              MaterialPageRoute(builder: (context) => routes[title]!()),
             );
-          } else if (title == 'Reserva') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ReservaScreen()),
-            );
-          } else if (title == 'Entregas') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RiderEntregaScreen()),
-            );
-          } else if (title == 'Puerta a Puerta') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RiderEntregaScreen()),
-            );
-          } else if (title == 'Farmacia') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ServicioFarmaciaScreen()),
-            );
-          } else if (title == 'Taller') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TallerScreen()),
-            );
-          } else if (title == 'Si bebe no conduzca') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SiNoDeboConducirScreen()),
-            );
-          } else if (title == 'Revisión Técnica') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RevisionTecnicaScreen()),
-            );
-          } else if (title == 'Traslado a otras ciudades') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TrasladoCiudadScreen()),
-            );
-          } else if (title == 'Adulto Mayor') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ServicioAdultoMayorScreen()),
-            );
-          } else if (title == 'Mascotas') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ServicioMascotasScreen()),
-            );
-          } 
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 40, color: Color(0xFF0462FF)),
+              Icon(icon, size: 40, color: Theme.of(context).primaryColor),
               const SizedBox(height: 10),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ],
           ),

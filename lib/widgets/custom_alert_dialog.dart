@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rider/theme/app_colors.dart';
+import 'package:rider/theme/app_text_styles.dart';
 
 class CustomAlertDialog extends StatelessWidget {
   final String title;
@@ -35,18 +37,14 @@ class CustomAlertDialog extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+            style: AppTextStyles.title,
           ),
         ],
       ),
       content: Text(
         message,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 16, color: Colors.black54),
+        style: AppTextStyles.body,
       ),
       actions: [
         Padding(
@@ -61,13 +59,9 @@ class CustomAlertDialog extends StatelessWidget {
             ),
             onPressed: onPressed,
             child: Center(
-              child: const Text(
+              child: Text(
                 'Aceptar',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: AppTextStyles.button,
               ),
             ),
           ),

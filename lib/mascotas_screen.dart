@@ -1,166 +1,235 @@
-// ignore_for_file: unused_field, library_private_types_in_public_api
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ServicioMascotasScreen extends StatefulWidget {
   const ServicioMascotasScreen({super.key});
 
   @override
-  _ServicioMascotasScreenState createState() => _ServicioMascotasScreenState();
+  State<ServicioMascotasScreen> createState() => _ServicioMascotasScreenState();
 }
 
 class _ServicioMascotasScreenState extends State<ServicioMascotasScreen> {
-         String? _tipoVehiculo;
-  String? _modoServicio;
-  DateTime? _fechaSeleccionada;  
-  TimeOfDay? _horaSeleccionada;
+  final TextEditingController _origenController = TextEditingController();
+  final TextEditingController _destinoController = TextEditingController();
 
-  void _seleccionarFecha(BuildContext context) async {
-    DateTime? fecha = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (fecha != null) {
-      setState(() {
-        _fechaSeleccionada = fecha;
-      });
-    }
+  String? _tipoMascota;
+  bool _vaEnCanil = false;
+
+  LatLng _initialPosition = LatLng(-33.45694, -70.64827);
+  late GoogleMapController _mapController;
+
+  final Set<Marker> _markers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationStatus();
   }
 
-  void _seleccionarHora(BuildContext context) async {
-    TimeOfDay? hora = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (hora != null) {
-      setState(() {
-        _horaSeleccionada = hora;
-      });
+  Future<void> _checkLocationStatus() async {
+    bool isLocationEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!isLocationEnabled) {
+      await Geolocator.openLocationSettings();
     }
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.deniedForever) return;
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      _initialPosition = LatLng(position.latitude, position.longitude);
+      _markers.add(
+        Marker(
+          markerId: MarkerId('ubicacion_actual'),
+          position: _initialPosition,
+          infoWindow: InfoWindow(title: 'Ubicación actual'),
+        ),
+      );
+    });
+
+    _mapController.animateCamera(
+      CameraUpdate.newLatLngZoom(_initialPosition, 14),
+    );
+  }
+
+  void _solicitarTrasladoMascota() {
+    final origen = _origenController.text.trim();
+    final destino = _destinoController.text.trim();
+
+    if (origen.isEmpty || destino.isEmpty || _tipoMascota == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Debes ingresar origen, destino y tipo de mascota'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Traslado solicitado'),
+        content: Text(
+          'Tipo: $_tipoMascota\nCanil: \${_vaEnCanil ? "Sí" : "No"}\nOrigen: \$origen\nDestino: \$destino',
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Aceptar'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tarjetaMascota(String tipo, IconData icono) {
+    final bool seleccionado = _tipoMascota == tipo;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _tipoMascota = tipo;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: seleccionado ? const Color(0xFF0462FF) : Colors.white,
+          border: Border.all(
+            color: seleccionado ? const Color(0xFF0462FF) : Colors.grey.shade300,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icono, color: seleccionado ? Colors.white : Colors.black),
+            const SizedBox(width: 12),
+            Text(
+              tipo,
+              style: TextStyle(
+                fontSize: 16,
+                color: seleccionado ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Revisión Técnica", style: TextStyle(color: Colors.white)),
+        title: const Text('Traslado de Mascotas'),
         backgroundColor: const Color(0xFF0462FF),
-        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: 
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center, 
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-
-                const Text("Selecciona el tipo de vehículo", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              _buildDropdownField(
-                label: "Tipo de vehículo",
-                icon: Icons.directions_car,
-                value: _tipoVehiculo,
-                items: ["Auto", "Moto", "Camioneta"],
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _tipoVehiculo = newValue;
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _seleccionarFecha(context),
-                      icon: Icon(Icons.calendar_today, color: Colors.white),
-                      label: Text(
-                        _fechaSeleccionada == null ? "Elegir Fecha" : "${_fechaSeleccionada!.toLocal()}".split(' ')[0],
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF0462FF),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _seleccionarHora(context),
-                      icon: Icon(Icons.access_time, color: Colors.white),
-                      label: Text(
-                        _horaSeleccionada == null ? "Elegir Hora" : _horaSeleccionada!.format(context),
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF0462FF),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text("Selecciona el tipo de traslado", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              _buildDropdownField(
-                label: "Tipo de traslado",
-                icon: Icons.work,
-                value: _modoServicio,
-                items: ["Persona", "Vehículo"],
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _modoServicio = newValue;
-                  });
-                },
-              ),
-              ],
+      body: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: _initialPosition,
+              zoom: 14,
             ),
-        ),
+            markers: _markers,
+            onMapCreated: (controller) => _mapController = controller,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+          ),
+          Positioned(
+            top: 16,
+            left: 16,
+            right: 16,
+            child: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _origenController,
+                      decoration: const InputDecoration(
+                        labelText: 'Dirección de origen',
+                        prefixIcon: Icon(Icons.location_on),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _destinoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Dirección de destino',
+                        prefixIcon: Icon(Icons.flag),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Tipo de mascota:'),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(child: _tarjetaMascota('Perro', Icons.pets)),
+                        const SizedBox(width: 12),
+                        Expanded(child: _tarjetaMascota('Gato', Icons.pets_outlined)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    CheckboxListTile(
+                      title: const Text('¿Va en canil?'),
+                      value: _vaEnCanil,
+                      onChanged: (value) {
+                        setState(() {
+                          _vaEnCanil = value ?? false;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            left: 16,
+            right: 16,
+            child: SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _solicitarTrasladoMascota,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0462FF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Solicitar Traslado',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-Widget _buildDropdownField({
-  required String label,
-  required IconData icon,
-  required String? value,
-  required List<String> items,
-  required ValueChanged<String?> onChanged,
-}) {
-  return Material(
-    elevation: 3,
-    borderRadius: BorderRadius.circular(12),
-    child: DropdownButtonFormField<String>(
-      value: value,
-      items: items.map((String item) {
-        return DropdownMenuItem<String>(
-          value: item,
-          child: Row(
-            children: [
-              Icon(icon, color: const Color(0xFF0462FF)),
-              const SizedBox(width: 8),
-              Text(item),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-      style: const TextStyle(fontSize: 16),
-    ),
-  );
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rider/theme/app_text_styles.dart';
 
 class Viaje {
   final String origen;
@@ -25,6 +26,10 @@ class ViajeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color estadoColor = viaje.estado == 'Completado'
+        ? Colors.green
+        : Colors.orange;
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
       shape: RoundedRectangleBorder(
@@ -37,39 +42,26 @@ class ViajeCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${viaje.origen} -> ${viaje.destino}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+              '${viaje.origen} → ${viaje.destino}',
+              style: AppTextStyles.title,
             ),
             const SizedBox(height: 10),
             Text(
               '${viaje.fecha}, ${viaje.hora}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: AppTextStyles.caption,
             ),
             const SizedBox(height: 10),
             Text(
-              'Costo: \$${viaje.costo.toStringAsFixed(3)}',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF0462FF),
+              'Costo: \$${viaje.costo.toStringAsFixed(0)}',
+              style: AppTextStyles.body.copyWith(
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor, // <- actualizado
               ),
             ),
             const SizedBox(height: 10),
             Text(
               'Estado: ${viaje.estado}',
-              style: TextStyle(
-                fontSize: 14,
-                color: viaje.estado == 'Completado'
-                    ? Colors.green
-                    : Colors.orange,
-              ),
+              style: AppTextStyles.caption.copyWith(color: estadoColor),
             ),
           ],
         ),

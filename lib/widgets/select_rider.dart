@@ -1,6 +1,5 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
+import 'package:rider/theme/app_text_styles.dart';
 
 class SeleccionRiderWidget extends StatefulWidget {
   final Function(String) onRiderSelected;
@@ -21,7 +20,7 @@ class _SeleccionRiderWidgetState extends State<SeleccionRiderWidget> {
       children: [
         Text(
           'Selecciona tu Rider',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: AppTextStyles.subtitle,
         ),
         const SizedBox(height: 12),
         _opcionRider('Vehículo tradicional', 'Rider básico', 0),
@@ -32,6 +31,10 @@ class _SeleccionRiderWidgetState extends State<SeleccionRiderWidget> {
   }
 
   Widget _opcionRider(String titulo, String descripcion, int extraCosto) {
+    final bool seleccionado = riderSeleccionado == titulo;
+    final Color primary = Theme.of(context).primaryColor;
+    final Color secondaryText = Theme.of(context).textTheme.bodySmall?.color ?? Colors.grey;
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -40,15 +43,15 @@ class _SeleccionRiderWidgetState extends State<SeleccionRiderWidget> {
         widget.onRiderSelected(titulo);
       },
       child: Card(
-        elevation: riderSeleccionado == titulo ? 5 : 2,
+        elevation: seleccionado ? 5 : 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
               Icon(
-                riderSeleccionado == titulo ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                color: riderSeleccionado == titulo ? Colors.blue : Colors.grey,
+                seleccionado ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                color: seleccionado ? primary : secondaryText,
               ),
               const SizedBox(width: 10),
               Column(
@@ -56,16 +59,16 @@ class _SeleccionRiderWidgetState extends State<SeleccionRiderWidget> {
                 children: [
                   Text(
                     titulo,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
                   ),
                   Text(
                     descripcion,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    style: AppTextStyles.caption,
                   ),
                   if (extraCosto > 0)
                     Text(
-                      '+ $extraCosto pesos',
-                      style: TextStyle(fontSize: 14, color: Colors.red),
+                      '+ \$${extraCosto.toStringAsFixed(0)}',
+                      style: AppTextStyles.caption.copyWith(color: Colors.red),
                     ),
                 ],
               ),

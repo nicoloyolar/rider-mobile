@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:rider/theme/app_theme.dart';
 import 'login_screen.dart';
 
+final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(AppTheme.userTheme); // default
+
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -11,10 +13,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: LoginScreen(),
+    return ValueListenableBuilder<ThemeData>(
+      valueListenable: appThemeNotifier,
+      builder: (context, theme, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: theme,
+          home: const LoginScreen(),
+        );
+      },
     );
   }
 }

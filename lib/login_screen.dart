@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:rider/driver_screen.dart';
+import 'package:rider/main.dart';
 import 'package:rider/main_screen.dart';
 import 'package:rider/register_screen.dart';
+import 'package:rider/theme/app_theme.dart';
 import 'package:rider/widgets/custom_alert_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -85,20 +87,19 @@ class _LoginScreenState extends State<LoginScreen> {
       String role = users[correo]!['role'];
 
       if (role == 'usuario') {
+        appThemeNotifier.value = AppTheme.userTheme;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => ViajesScreen(userEmail: correo),
-          ),
+          MaterialPageRoute(builder: (context) => ViajesScreen(userEmail: correo)),
         );
       } else if (role == 'conductor') {
+        appThemeNotifier.value = AppTheme.driverTheme;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => DriverScreen(userEmail: correo),
-          ),
+          MaterialPageRoute(builder: (context) => DriverScreen(userEmail: correo)),
         );
       }
+
     } else {
       showDialog(
         context: context,
