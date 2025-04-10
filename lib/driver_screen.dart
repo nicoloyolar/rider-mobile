@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field, prefer_final_fields, library_private_types_in_public_api, deprecated_member_use
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rider/widgets/custom_app_bar.dart';
@@ -23,7 +24,22 @@ class _DriverScreenState extends State<DriverScreen> {
   int totalTrips = 0;
 
   String? selectedCar = ''; 
-  List<String> cars = ["Toyota Corolla", "Honda Civic"]; 
+  List<String> cars = ["Toyota Corolla", "Honda Civic"];
+
+  bool _showingTripRequest = false; 
+  late Timer _tripRequestTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTripRequestTimer();
+  }
+
+  @override
+  void dispose() {
+    _tripRequestTimer.cancel(); 
+    super.dispose();
+  }
 
   void _toggleOnlineStatus() {
     setState(() {
@@ -31,83 +47,199 @@ class _DriverScreenState extends State<DriverScreen> {
     });
   }
 
-  void _showCarSelectionDialog(BuildContext context) {
-    showDialog(
+  void _startTripRequestTimer() {
+    _tripRequestTimer = Timer.periodic(Duration(seconds: 20), (timer) {
+      if (isOnline && !_showingTripRequest) {
+        _showTripRequest(context);
+      }
+    });
+  }
+
+  void _showTripRequest(BuildContext context) {
+    setState(() {
+      _showingTripRequest = true;
+    });
+
+    String selectedVehicle = 'Rider';
+    String selectedPayment = 'Tarjeta';
+    double precioViaje = 5.000;
+
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Selecciona un Auto"),
-          content: SizedBox(
-            width: double.maxFinite, 
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Radio<String>(
-                      value: "Toyota Corolla",
-                      groupValue: selectedCar,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedCar = value;
-                        });
-                      },
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.40,
+              minChildSize: 0.12,
+              maxChildSize: 0.85,
+              expand: false,
+              builder: (context, scrollController) {
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: Color(0xFF0462FF),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Tiempo estimado: 8 min',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        Material(
+                          elevation: 4,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: AssetImage('assets/logo.png'),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Juan Pérez',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text('Viajes: 120', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        children: List.generate(7, (index) {
+                                          return Icon(
+                                            index < 6 ? Icons.star : Icons.star_half,
+                                            color: Colors.amber,
+                                            size: 18,
+                                          );
+                                        }),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text('Calificación: 6.5', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Precio del viaje: \$${precioViaje.toStringAsFixed(2)}',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _infoItem(Icons.credit_card, 'Pago', selectedPayment),
+                            _infoItem(Icons.directions_car, 'Vehículo', selectedVehicle),
+                            _infoItem(Icons.assignment_ind, 'Patente', 'GH-KT-23'),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Divider(),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _infoItem(Icons.location_on, 'Distancia', '5.2 km'),
+                            _infoItem(Icons.timer, 'Tiempo', '8 min'),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _showingTripRequest = false;
+                            });
+                            Navigator.pop(context); 
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          ),
+                          child: Text('Aceptar Viaje', style: TextStyle(color: Colors.white, fontSize: 16)),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _showingTripRequest = false;
+                            });
+                            Navigator.pop(context); 
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                          ),
+                          child: Text('Cancelar Viaje', style: TextStyle(color: Colors.white, fontSize: 16)),
+                        ),
+                      ],
                     ),
-                    Text("Toyota Corolla"),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio<String>(
-                      value: "Honda Civic",
-                      groupValue: selectedCar,
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedCar = value;
-                        });
-                      },
-                    ),
-                    Text("Honda Civic"),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (selectedCar != null && selectedCar!.isNotEmpty) {
-                  _selectCar(selectedCar!);
-                  Navigator.pop(context); 
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Por favor, selecciona un auto")),
-                  );
-                }
+                  ),
+                );
               },
-              child: Text("Confirmar"),
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
-  void _selectCar(String selectedCar) {
-
-    setState(() {
-      isOnline = true;
-    });
+  Widget _infoItem(IconData icon, String label, String value) {
+    return Column(
+      children: [
+        Icon(icon, size: 30, color: Colors.blue),
+        const SizedBox(height: 6),
+        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey)),
+        const SizedBox(height: 4),
+        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Rider App',  
-        userEmail: 'conductor',  
-        onLogout: () {
-        },
+        title: 'Rider App',
+        userEmail: 'conductor',
+        onLogout: () {},
       ),
       body: Stack(
         children: [
@@ -141,26 +273,17 @@ class _DriverScreenState extends State<DriverScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Text(
                         "Ganancias Totales: \$${totalEarnings.toStringAsFixed(2)}",
-                        style: TextStyle(
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w500, 
-                          color: Colors.black87, 
-                        ),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87),
                       ),
                     ),
-                    
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Text(
                         "Total de Viajes: $totalTrips",
-                        style: TextStyle(
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w500, 
-                          color: Colors.black87, 
-                        ),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87),
                       ),
                     ),
-                    SizedBox(height: 16), 
+                    SizedBox(height: 16),
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
@@ -198,71 +321,34 @@ class _DriverScreenState extends State<DriverScreen> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 80,
-            left: 16,
-            right: 16,
-            child: Material(
-              elevation: 4,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      "Billetera",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "\$5.000", 
-                      style: TextStyle(fontSize: 20, color: Colors.green),
-                    ),
-                    SizedBox(height: 16),
-                    Divider(),
-                    SizedBox(height: 8),
-                    Text("Viajes Realizados: $totalTrips"),
-                    SizedBox(height: 8),
-                    Text("Ganancias Totales: \$${totalEarnings.toStringAsFixed(2)}"),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0462FF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 5,
-                ),
-                child: Text(
-                  'Iniciar Viaje',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
+    );
+  }
+
+  void _showCarSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Selecciona tu vehículo"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: cars.map((car) {
+              return ListTile(
+                title: Text(car),
+                onTap: () {
+                  setState(() {
+                    selectedCar = car;
+                  });
+                  Navigator.pop(context);
+                  _toggleOnlineStatus();
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 }
