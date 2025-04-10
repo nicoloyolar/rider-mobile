@@ -12,6 +12,7 @@ import 'package:rider/taller_screen.dart';
 import 'package:rider/traslado_ciudad_screen.dart';
 import 'package:rider/traslados_screen.dart';
 import 'package:rider/widgets/custom_app_bar.dart'; 
+import 'package:rider/theme/app_colors.dart';
 
 class ViajesScreen extends StatelessWidget {
   final String userEmail;
@@ -65,7 +66,7 @@ class ViajesScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Color(0xFF0462FF),
+        selectedItemColor: AppColors.primary,
         unselectedItemColor: Colors.grey,
         currentIndex: 1,
         onTap: (index) {

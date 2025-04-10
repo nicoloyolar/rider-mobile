@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rider/theme/app_theme.dart';
 import 'login_screen.dart';
 
 void main() {
@@ -12,9 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: AppTheme.lightTheme,
       home: LoginScreen(),
     );
   }
