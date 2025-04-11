@@ -1,216 +1,188 @@
-// ignore_for_file: library_private_types_in_public_api
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:rider/driver_screen.dart';
-import 'package:rider/main.dart';
-import 'package:rider/main_screen.dart';
-import 'package:rider/register_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rider/main.dart'; // importa appThemeNotifier
 import 'package:rider/theme/app_theme.dart';
 import 'package:rider/widgets/custom_alert_dialog.dart';
+import 'package:rider/main_screen.dart';
+import 'package:rider/driver_screen.dart';
+import 'package:rider/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController          = TextEditingController();
-  final TextEditingController _passwordController       = TextEditingController();
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey  = GlobalKey<ScaffoldMessengerState>();
-  
-  String currentUser = ''; 
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  final Map<String, Map<String, dynamic>> users = {
-    'usuario': {
-      'password': '123456',
-      'role': 'usuario',
-      'certificado': null, 
-      'descuento': 0.0,
-    },
-    'conductor': {
-      'password': '123456',
-      'role': 'conductor',
-      'certificado': null,
-      'descuento': 0.0,
-    },
-    'estudiante': {
-      'password': '123456',
-      'role': 'usuario',
-      'certificado': 'estudiante',
-      'descuento': 0.10, 
-    },
-    'bombero': {
-      'password': '123456',
-      'role': 'usuario',
-      'certificado': 'bombero',
-      'descuento': 0.10,
-    },
-    'adulto_mayor': {
-      'password': '123456',
-      'role': 'usuario',
-      'certificado': 'adulto mayor',
-      'descuento': 0.10,
-    },
-    'discapacitado': {
-      'password': '123456',
-      'role': 'usuario',
-      'certificado': 'discapacitado',
-      'descuento': 0.10,
-    },
-  };
-
-  void _login() {
-    String correo = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-
-    if (correo.isEmpty || password.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CustomAlertDialog(
-            title: "¡Error!",
-            message: "Por favor complete todos los campos",
-            icon: Icons.error,
-            backgroundColor: Colors.red,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          );
-        },
+  Future<void> _signInWithEmail() async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
-      return;
+      _handleUserLogin(credential.user);
+    } catch (e) {
+      _showError("Correo o contraseña incorrectos");
     }
+  }
 
-    if (users.containsKey(correo) && users[correo]!['password'] == password) {
-      String role = users[correo]!['role'];
+Future<void> _signInWithGoogle() async {
+  try {
+    final googleUser = await GoogleSignIn().signIn();
+    print('GOOGLE USER: $googleUser'); // 👈 VERIFICA ESTO EN LA CONSOLA
+    final googleAuth = await googleUser?.authentication;
 
-      if (role == 'usuario') {
-        appThemeNotifier.value = AppTheme.userTheme;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ViajesScreen(userEmail: correo)),
-        );
-      } else if (role == 'conductor') {
-        appThemeNotifier.value = AppTheme.driverTheme;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DriverScreen(userEmail: correo)),
-        );
+    if (googleUser != null && googleAuth != null) {
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      _handleUserLogin(userCredential.user);
+    }
+  } catch (e) {
+    print('GOOGLE SIGN-IN ERROR: $e'); // 👈 Imprime si falla
+    _showError("No se pudo iniciar sesión con Google");
+  }
+}
+
+  Future<void> _signInWithFacebook() async {
+    try {
+      final result = await FacebookAuth.instance.login();
+      if (result.status == LoginStatus.success) {
+        final accessToken = result.accessToken;
+        final credential = FacebookAuthProvider.credential(accessToken!.token);
+        final userCredential =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+        _handleUserLogin(userCredential.user);
+      } else {
+        _showError("Login cancelado");
       }
+    } catch (e) {
+      _showError("No se pudo iniciar sesión con Facebook");
+    }
+  }
 
+  Future<void> _handleUserLogin(User? user) async {
+    if (user == null) return;
+
+    final correo = user.email ?? "usuario";
+    final role = correo == 'conductor@rider.com' ? 'conductor' : 'usuario';
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_logged_in', true);
+    await prefs.setString('logged_email', correo);
+
+    if (role == 'usuario') {
+      appThemeNotifier.value = AppTheme.userTheme;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ViajesScreen(userEmail: correo)),
+      );
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CustomAlertDialog(
-            title: "¡Error!",
-            message: "Correo o contraseña incorrectos",
-            icon: Icons.error,
-            backgroundColor: Colors.red,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          );
-        },
+      appThemeNotifier.value = AppTheme.driverTheme;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DriverScreen(userEmail: correo)),
       );
     }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => CustomAlertDialog(
+        title: "¡Error!",
+        message: message,
+        icon: Icons.error,
+        backgroundColor: Colors.red,
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       backgroundColor: Colors.white,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: 120,
-                width: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Color(0xFF0462FF), width: 3),
-                  color: Colors.white,
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/logo.png',
-                    fit: BoxFit.cover,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Image.asset('assets/logo.png', height: 120),
+                const SizedBox(height: 40),
+
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Correo',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  labelText: 'Correo electrónico',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF0462FF)),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    prefixIcon: Icon(Icons.lock),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  prefixIcon: Icon(Icons.email, color: Color(0xFF0462FF)),
                 ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  labelText: 'Contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFF0462FF)),
-                  ),
-                  prefixIcon: Icon(Icons.lock, color: Color(0xFF0462FF)),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _login,
+
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _signInWithEmail,
+                  child: const Text('Ingresar'),
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
                     backgroundColor: Color(0xFF0462FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: Text(
-                    'Ingresar',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()),
-                  );
-                },
-                child: const Text(
-                  'Registrarse',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0462FF)),
+
+                const SizedBox(height: 16),
+                const Divider(),
+                const Text("O ingresa con"),
+                const SizedBox(height: 16),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Image.asset('assets/icons/google.png', height: 40),
+                      onPressed: _signInWithGoogle,
+                    ),
+                    const SizedBox(width: 24),
+                    IconButton(
+                      icon: Image.asset('assets/icons/facebook.png', height: 40),
+                      onPressed: _signInWithFacebook,
+                    ),
+                  ],
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()));
+                  },
+                  child: const Text('¿No tienes cuenta? Regístrate'),
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '/login_screen.dart';
 import '/main_screen.dart';
@@ -32,51 +33,45 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateNext() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isFirstTime = prefs.getBool('first_time') ?? true;
-    bool showWelcomeScreen = prefs.getBool('show_welcome_screen') ?? true;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isFirstTime = prefs.getBool('first_time') ?? true;
+  bool showWelcomeScreen = prefs.getBool('show_welcome_screen') ?? true;
 
-    // 🔒 Aquí podrías verificar autenticación con Firebase o recuperar sesión guardada
-    // final currentUser = FirebaseAuth.instance.currentUser;
-    // bool isLoggedIn = currentUser != null;
-    // String? email = currentUser?.email;
-    // String? email = prefs.getString('logged_email');
+  // 🔒 Verificación real con Firebase
+  final currentUser = FirebaseAuth.instance.currentUser;
+  bool isLoggedIn = currentUser != null;
+  String email = currentUser?.email ?? 'usuario';
 
-    // 🔁 Simulación temporal:
-    bool isLoggedIn = false;
-    String email = 'usuario';
+  if (!_hasInternet) return;
 
-    if (!_hasInternet) return;
-
-    if (isFirstTime || showWelcomeScreen) {
-      bool doNotShowAgain = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => WelcomeScreen(
-                username: email,
-                isOwner: false,
-                showNoMoreButton: !isFirstTime,
-                onNext: _onNextPressed,
-              ),
+  if (isFirstTime || showWelcomeScreen) {
+    bool doNotShowAgain = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WelcomeScreen(
+              username: email,
+              isOwner: false,
+              showNoMoreButton: !isFirstTime,
+              onNext: _onNextPressed,
             ),
-          ) ??
-          false;
+          ),
+        ) ??
+        false;
 
-      if (doNotShowAgain) {
-        await prefs.setBool('show_welcome_screen', false);
-      }
-      await prefs.setBool('first_time', false);
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => isLoggedIn
-              ? ViajesScreen(userEmail: email)
-              : const LoginScreen(),
-        ),
-      );
+    if (doNotShowAgain) {
+      await prefs.setBool('show_welcome_screen', false);
     }
+    await prefs.setBool('first_time', false);
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            isLoggedIn ? ViajesScreen(userEmail: email) : const LoginScreen(),
+      ),
+    );
   }
+}
 
   void _onNextPressed() {
     // 🔁 Simulación temporal:

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1082426468989",
+    "project_id": "rider-chile-test",
+    "storage_bucket": "rider-chile-test.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082426468989:android:f504e0414da3e0fc325f14",
+        "android_client_info": {
+          "package_name": "com.example.rider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082426468989-84ou2rdu6vr3q3koj0vt53bhi8qvftqk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rider",
+            "certificate_hash": "42c050999edc2e21920a6b5bb3fa5e37b613339d"
+          }
+        },
+        {
+          "client_id": "1082426468989-uq9ook413hfev65gnhtf9i7488u7dree.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrCYPW9AeZHn7KkgLC7Y2RdVPTTDp--bM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1082426468989-uq9ook413hfev65gnhtf9i7488u7dree.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

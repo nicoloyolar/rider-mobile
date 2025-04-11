@@ -1,7 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:rider/history_screen.dart';
+import 'package:rider/login_screen.dart';
 import 'package:rider/main_screen.dart';
 import 'package:rider/widgets/custom_app_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CuentaScreen extends StatelessWidget {
   final String userEmail;
@@ -14,8 +19,20 @@ class CuentaScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Cuenta',  
         userEmail: userEmail,  
-        onLogout: () {
-        },
+        onLogout: () async {
+            await FirebaseAuth.instance.signOut();
+            await GoogleSignIn().signOut();
+            await FacebookAuth.instance.logOut();
+
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.clear();
+
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,
+            );
+          },
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

@@ -50,23 +50,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CustomAlertDialog(
-          title: 'Cerrar sesión',
-          message: '¿Estás seguro de que deseas cerrar sesión?',
-          icon: Icons.exit_to_app,
-          backgroundColor: Colors.red,
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
-          },
-        );
-      },
-    );
-  }
+void _showLogoutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return CustomAlertDialog(
+        title: 'Cerrar sesión',
+        message: '¿Estás seguro de que deseas cerrar sesión?',
+        icon: Icons.exit_to_app,
+        backgroundColor: Colors.red,
+        onPressed: () {
+          Navigator.pop(context); // Cierra el diálogo
+          onLogout();             // Ejecuta el callback real
+        },
+      );
+    },
+  );
+}
 }
