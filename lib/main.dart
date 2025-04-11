@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rider/theme/app_theme.dart';
 import 'login_screen.dart';
+import 'package:rider/formulario_traslado_screen.dart';
+import 'package:rider/mapa_traslado_screen.dart';
 
 final ValueNotifier<ThemeData> appThemeNotifier = ValueNotifier(AppTheme.userTheme); // default
 
@@ -20,6 +22,10 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: theme,
           home: const LoginScreen(),
+          routes: {
+            '/formularioTraslado': (context) => const FormularioTrasladoScreen(titulo: 'Nuevo Viaje'),
+            '/mapaTraslado': (context) => const MapaTrasladoScreen(),
+          },
         );
       },
     );

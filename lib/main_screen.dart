@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rider/account_screen.dart';
 import 'package:rider/adulto_mayor_screen.dart';
 import 'package:rider/entregas_screen.dart';
 import 'package:rider/farmacia_screen.dart';
-import 'package:rider/history_screen.dart';
 import 'package:rider/mascotas_screen.dart';
 import 'package:rider/no_conduzca_screen.dart';
 import 'package:rider/reserva_screen.dart';
@@ -11,7 +9,8 @@ import 'package:rider/revision_tecnica_screen.dart';
 import 'package:rider/taller_screen.dart';
 import 'package:rider/traslado_ciudad_screen.dart';
 import 'package:rider/traslados_screen.dart';
-import 'package:rider/widgets/custom_app_bar.dart';
+import 'package:rider/history_screen.dart';
+import 'package:rider/account_screen.dart';
 
 class ViajesScreen extends StatelessWidget {
   final String userEmail;
@@ -21,46 +20,93 @@ class ViajesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Rider App',
-        userEmail: userEmail,
-        onLogout: () {},
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionTitle(context, 'Forma de Reservar'),
-            _buildServiceGrid(context, [
-              _buildServiceCard(context, 'Traslados', Icons.directions_car),
-              _buildServiceCard(context, 'Reserva', Icons.calendar_today),
-            ], isTall: true),
-            const SizedBox(height: 20),
-            _buildSectionTitle(context, 'Entregas'),
-            _buildServiceGrid(context, [
-              _buildServiceCard(context, 'Entregas', Icons.local_shipping),
-              _buildServiceCard(context, 'Puerta a Puerta', Icons.home),
-              _buildServiceCard(context, 'Farmacia', Icons.local_pharmacy),
-            ], crossAxisCount: 3, isTall: false),
-            const SizedBox(height: 20),
-            _buildSectionTitle(context, 'Otros Servicios'),
-            _buildServiceGrid(context, [
-              _buildServiceCard(context, 'Taller', Icons.build),
-              _buildServiceCard(context, 'Si bebe no conduzca', Icons.child_care),
-              _buildServiceCard(context, 'Revisión Técnica', Icons.car_repair),
-              _buildServiceCard(context, 'Traslado a otras ciudades', Icons.location_city),
-              _buildServiceCard(context, 'Adulto Mayor', Icons.elderly),
-              _buildServiceCard(context, 'Mascotas', Icons.pets),
-            ], isTall: true),
-            const SizedBox(height: 20),
-          ],
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+  preferredSize: const Size.fromHeight(0),
+  child: AppBar(
+    backgroundColor: Colors.white,
+    elevation: 0,
+  ),
+),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text('Hola, ${_formatearNombre(userEmail)} 👋',
+        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+    const CircleAvatar(
+      radius: 20,
+      backgroundImage: AssetImage('assets/logo.png'), // Tu logo aquí
+    ),
+  ],
+),
+              const Text('¿Qué necesitas hoy?',
+                  style: TextStyle(fontSize: 18, color: Colors.black54)),
+              const SizedBox(height: 24),
+
+              _buildSectionTitle('Forma de Reservar'),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: _buildCard(context, 'Traslados', Icons.directions_car,
+                      'Solicita un viaje desde tu ubicación actual a un destino específico.',
+                      const TrasladosScreen())),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildCard(context, 'Reserva', Icons.calendar_today,
+                      'Agenda un viaje con fecha y hora definida.',
+                      const ReservaScreen())),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+              _buildSectionTitle('Entregas'),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: _buildCard(context, 'Entregas', Icons.local_shipping,
+                      'Envía objetos o documentos a otra dirección.',
+                      const RiderEntregaScreen())),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildCard(context, 'Puerta a Puerta', Icons.home,
+                      'Servicio directo entre dos ubicaciones.',
+                      const RiderEntregaScreen())),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildCard(context, 'Farmacia', Icons.local_pharmacy,
+                      'Solicita el retiro de medicamentos desde una farmacia.',
+                      const ServicioFarmaciaScreen())),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+              _buildSectionTitle('Otros Servicios'),
+const SizedBox(height: 12),
+SizedBox(
+  height: 100,
+  child: ListView(
+    scrollDirection: Axis.horizontal,
+    children: [
+      _buildMiniCard(context, 'Pet Friendly', Icons.pets, const ServicioMascotasScreen(), highlight: true),
+      _buildMiniCard(context, 'Taller', Icons.build, const TallerScreen()),
+      _buildMiniCard(context, 'No Conduzca', Icons.emoji_people, const SiNoDeboConducirScreen()),
+      _buildMiniCard(context, 'Revisión Técnica', Icons.car_repair, const RevisionTecnicaScreen()),
+      _buildMiniCard(context, 'Adulto Mayor', Icons.elderly, const ServicioAdultoMayorScreen()),
+      _buildMiniCard(context, 'Otras Ciudades', Icons.location_city, const TrasladoCiudadScreen()),
+    ],
+  ),
+),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
         selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Colors.grey,
-        currentIndex: 1,
         onTap: (index) {
           switch (index) {
             case 0:
@@ -88,77 +134,72 @@ class ViajesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-    );
+  Widget _buildSectionTitle(String title) {
+    return Text(title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold));
   }
 
-  Widget _buildServiceGrid(BuildContext context, List<Widget> cards, {int crossAxisCount = 2, bool isTall = true}) {
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: isTall ? 1.2 : 0.8,
-      children: cards,
-    );
-  }
-
-  Widget _buildServiceCard(BuildContext context, String title, IconData icon) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          final routes = {
-            'Traslados': () => const TrasladosScreen(),
-            'Reserva': () => const ReservaScreen(),
-            'Entregas': () => const RiderEntregaScreen(),
-            'Puerta a Puerta': () => const RiderEntregaScreen(),
-            'Farmacia': () => const ServicioFarmaciaScreen(),
-            'Taller': () => const TallerScreen(),
-            'Si bebe no conduzca': () => const SiNoDeboConducirScreen(),
-            'Revisión Técnica': () => const RevisionTecnicaScreen(),
-            'Traslado a otras ciudades': () => const TrasladoCiudadScreen(),
-            'Adulto Mayor': () => const ServicioAdultoMayorScreen(),
-            'Mascotas': () => const ServicioMascotasScreen(),
-          };
-
-          if (routes.containsKey(title)) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => routes[title]!()),
-            );
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: Theme.of(context).primaryColor),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ],
-          ),
+  Widget _buildCard(BuildContext context, String title, IconData icon, String description, Widget screen) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade300),
+          color: Colors.white,
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 30, color: Theme.of(context).primaryColor),
+            const SizedBox(height: 12),
+            Text(title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+            const SizedBox(height: 6),
+            //Text(description,
+              //  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                //textAlign: TextAlign.center),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildMiniCard(BuildContext context, String title, IconData icon, Widget screen, {bool highlight = false}) {
+  final bgColor = highlight ? Colors.green.shade100 : Colors.orange.shade100;
+  final iconColor = highlight ? Colors.green : Colors.orange;
+
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+    },
+    child: Container(
+      width: 100,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 28, color: iconColor),
+          const SizedBox(height: 6),
+          Text(title,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center),
+        ],
+      ),
+    ),
+  );
+}
+
+  String _formatearNombre(String email) {
+    return email.split('@').first.replaceFirstMapped(RegExp(r'^.'), (m) => m[0]!.toUpperCase());
   }
 }

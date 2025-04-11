@@ -1,6 +1,5 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
+import 'base_traslado_screen.dart'; // Asegúrate de importar tu pantalla base
 
 class ServicioFarmaciaScreen extends StatefulWidget {
   const ServicioFarmaciaScreen({super.key});
@@ -69,97 +68,58 @@ class _ServicioFarmaciaScreenState extends State<ServicioFarmaciaScreen> {
     );
   }
 
+  Widget _buildFarmaciaExtra() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "¿El medicamento requiere receta médica?",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile(
+                title: const Text("Sí"),
+                value: true,
+                groupValue: conReceta,
+                onChanged: (value) => setState(() => conReceta = value!),
+              ),
+            ),
+            Expanded(
+              child: RadioListTile(
+                title: const Text("No"),
+                value: false,
+                groupValue: conReceta,
+                onChanged: (value) => setState(() => conReceta = value!),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (conReceta)
+          _buildInputField(
+            label: "Parada (Farmacia)",
+            icon: Icons.local_pharmacy,
+            controller: _paradaController,
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Farmacia',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 22, 
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: const Color(0xFF0462FF),
-        centerTitle: true,
+    return BaseTrasladoScreen(
+      titulo: "Farmacia",
+      widgetExtra: Column(
+        children: [
+          const SizedBox(height: 16),
+          _buildFarmaciaExtra(),
+        ],
       ),
-      body: Center( 
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, 
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "¿El medicamento requiere receta médica?",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18, 
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: RadioListTile(
-                      title: const Text("Sí"),
-                      value: true,
-                      groupValue: conReceta,
-                      onChanged: (value) => setState(() => conReceta = value!),
-                    ),
-                  ),
-                  Expanded(
-                    child: RadioListTile(
-                      title: const Text("No"),
-                      value: false,
-                      groupValue: conReceta,
-                      onChanged: (value) => setState(() => conReceta = value!),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildInputField(
-                label: "Origen",
-                icon: Icons.location_on,
-                controller: _origenController,
-                readOnly: true,
-              ),
-              const SizedBox(height: 10),
-              if (conReceta)
-                _buildInputField(
-                  label: "Parada (Farmacia)",
-                  icon: Icons.local_pharmacy,
-                  controller: _paradaController,
-                ),
-              const SizedBox(height: 10),
-              _buildInputField(
-                label: "Destino",
-                icon: Icons.home,
-                controller: _destinoController,
-              ),
-              const SizedBox(height: 25),
-              ElevatedButton.icon(
-                onPressed: _confirmarPedido,
-                icon: const Icon(Icons.local_hospital, color: Colors.white, size: 24),
-                label: const Text(
-                  "Solicitar Rider Farmacia",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  backgroundColor: const Color(0xFF0462FF),
-                  elevation: 4, 
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      onConfirmar: _confirmarPedido,
     );
   }
 }
